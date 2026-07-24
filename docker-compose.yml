@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  # Base de Datos MySQL 8.4 LTS
+  database:
+    image: mysql:8.4
+    container_name: mysql_energia_db
+    restart: always
+    environment:
+      MYSQL_DATABASE: energia_db
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  # API Backend en Spring Boot (Java 25)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: api_backend_energia
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://database:3306/energia_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+    depends_on:
+      - database
+
+volumes:
+  mysql_data:
