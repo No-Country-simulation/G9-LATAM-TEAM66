@@ -1,0 +1,10 @@
+# Java / Maven (Backend)
+**/tarjet/
+**/.mvn/
+**/*.jar
+
+# IDEs
+**/.idea/
+**/*.iml
+**/.vscode/
+
