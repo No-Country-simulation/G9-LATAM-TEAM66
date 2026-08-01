@@ -1,30 +1,41 @@
 package com.team66.backend.domain.analisis;
 
-import jakarta.validation.constraints.*;
+import com.team66.backend.domain.analisis.FrecuenciaUso;
+import com.team66.backend.domain.analisis.TipoInmueble;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 public record DTOAnalisisEnergetico(
 
-    @NotNull
-    @Positive
-    @DecimalMax(value = "100000")
-    BigDecimal consumoKwh,
+    @NotNull(message = "La fecha de registro es obligatoria")
+    LocalDate fechaRegistro,
 
-    @NotNull
-    Boolean usoHorarioPico,
-
-    @NotNull
-    @Min(1)
-    @Max(100)
-    Integer cantidadEquipos,
-
-    @NotNull
+    @NotNull(message = "El tipo de inmueble es obligatorio")
     TipoInmueble tipoInmueble,
 
-    @NotNull
-    @Min(0)
-    @Max(24)
-    Integer horasAltoConsumo
-) {}
+    @NotNull(message = "El consumo en kWh es obligatorio")
+    @DecimalMin(value = "0.01", message = "El consumo debe ser mayor a 0")
+    BigDecimal consumoKwh,
 
+    @NotNull(message = "El uso en horario pico es obligatorio")
+    Boolean usoHorarioPico,
+
+    @NotNull(message = "La cantidad de equipos es obligatoria")
+    @Min(value = 1, message = "Debe existir al menos un equipo")
+    Integer cantidadEquipos,
+
+    @NotNull(message = "La frecuencia de uso es obligatoria")
+    FrecuenciaUso frecuenciaUso,
+
+    @NotNull(message = "Las horas de alto consumo son obligatorias")
+    @Min(value = 0, message = "Las horas de alto consumo no pueden ser negativas")
+    @Max(value = 24, message = "Las horas de alto consumo no pueden superar 24")
+    Integer horasAltoConsumo
+
+) {
+}
