@@ -1,7 +1,6 @@
-package com.team66.backend.domain.analisis;
+package com.team66.backend.dto;
 
-import com.team66.backend.domain.analisis.FrecuenciaUso;
-import com.team66.backend.domain.analisis.TipoInmueble;
+
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -10,7 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public record DTOAnalisisEnergetico(
+public record AnalisisEnergetico(
 
     @NotNull(message = "La fecha de registro es obligatoria")
     LocalDate fechaRegistro,
