@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>EnergiAI — Wireframe</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #F5F5F3;
+    margin: 0;
+    padding: 40px;
+  }
+  .container {
+    max-width: 680px;
+    margin: 0 auto;
+  }
+  h1 {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0 0 20px;
+    color: #1A1A1A;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .card {
+    background: #FFFFFF;
+    border: 1px solid #E0E0DC;
+    border-radius: 12px;
+    padding: 16px 20px;
+  }
+  .section-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #666660;
+    margin: 0 0 12px;
+  }
+  label {
+    font-size: 12px;
+    color: #999992;
+    display: block;
+    margin-bottom: 2px;
+  }
+  input, select {
+    width: 100%;
+    height: 36px;
+    border: 1px solid #D6D6D0;
+    border-radius: 6px;
+    padding: 0 10px;
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: #333330;
+    background: #FAFAF8;
+  }
+  .checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    margin-bottom: 14px;
+    color: #333330;
+  }
+  .checkbox-row input { width: auto; height: auto; margin: 0; }
+  button.primary {
+    width: 100%;
+    height: 40px;
+    background: #1A1A1A;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .right-col {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .badge {
+    display: inline-block;
+    background: #FCEBEB;
+    color: #791F1F;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 4px 12px;
+    border-radius: 6px;
+  }
+  .confidence {
+    font-size: 13px;
+    color: #666660;
+    margin-left: 10px;
+  }
+  .cost-value {
+    font-size: 26px;
+    font-weight: 600;
+    margin: 4px 0 0;
+    color: #1A1A1A;
+  }
+  .cost-note {
+    font-size: 12px;
+    color: #999992;
+    margin: 4px 0 0;
+  }
+  ul.reco {
+    margin: 0;
+    padding-left: 18px;
+    font-size: 13px;
+    line-height: 1.7;
+    color: #333330;
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <h1>EnergiAI — pantalla principal</h1>
+
+    <div class="grid">
+
+      <!-- Columna izquierda: formulario -->
+      <div class="card">
+        <p class="section-label">1. Datos de consumo</p>
+
+        <label>Consumo mensual (kWh)</label>
+        <input type="number" placeholder="420">
+
+        <label>Tipo de inmueble</label>
+        <select>
+          <option>Casa</option>
+          <option>Departamento</option>
+          <option>Local comercial</option>
+        </select>
+
+        <label>Cantidad de equipos</label>
+        <input type="number" placeholder="10">
+
+        <label>Horas de alto consumo</label>
+        <input type="number" placeholder="8">
+
+        <div class="checkbox-row">
+          <input type="checkbox"> Uso en horario pico
+        </div>
+
+        <button class="primary">Analizar consumo</button>
+      </div>
+
+      <!-- Columna derecha: resultados -->
+      <div class="right-col">
+
+        <div class="card">
+          <p class="section-label">2. Resultado</p>
+          <span class="badge">Ineficiente</span>
+          <span class="confidence">81% de confianza</span>
+        </div>
+
+        <div class="card">
+          <p class="section-label">3. Costo estimado</p>
+          <p class="cost-value">$315.00</p>
+          <p class="cost-note">referencia $0.75/kWh</p>
+        </div>
+
+        <div class="card">
+          <p class="section-label">4. Recomendaciones</p>
+          <ul class="reco">
+            <li>Reducir uso en horario pico</li>
+            <li>Evaluar equipos de alto consumo</li>
+            <li>Distribuir cargas a lo largo del día</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</body>
+</html>
