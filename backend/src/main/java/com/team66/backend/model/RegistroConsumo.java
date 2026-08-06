@@ -1,5 +1,8 @@
-package com.team66.backend.domain.analisis;
+package com.team66.backend.model;
 
+import com.team66.backend.dto.CategoriaEnergetica;
+import com.team66.backend.dto.FrecuenciaUso;
+import com.team66.backend.dto.TipoInmueble;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -1,4 +1,4 @@
-package com.team66.backend.domain.analisis;
+package com.team66.backend.dto;
 
 public enum TipoInmueble {
     CASA,
