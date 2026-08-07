@@ -6,6 +6,7 @@ import com.team66.backend.dto.ConsumoRequest;
 import com.team66.backend.dto.FrecuenciaUso;
 import com.team66.backend.model.RegistroConsumo;
 import com.team66.backend.repository.RegistroConsumoReposotory;
+import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -16,6 +17,7 @@ import java.util.List;
 /**
  * Me falta documentar. Héctor.
  */
+@Service
 public class AnalisisEnergeticoService {
 
     public static final BigDecimal TARIFA_REFERENCIA = new BigDecimal("0.75");
