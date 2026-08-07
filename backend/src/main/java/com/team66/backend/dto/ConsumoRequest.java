@@ -10,10 +10,7 @@ import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 public record ConsumoRequest(
-    /**
-    @NotNull(message = "La fecha de registro es obligatoria")
-    LocalDate fechaRegistro,
-    **/
+    
     @NotNull(message = "El tipo de inmueble es obligatorio")
     @JsonProperty("tipo_inmueble")
     TipoInmueble tipoInmueble,
