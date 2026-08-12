@@ -14,6 +14,7 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
       - ./backend/init/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+      - ./backend/init/datos.csv:/docker-entrypoint-initdb.d/datos.csv:ro
 
   # API Backend en Spring Boot (Java 25)
   backend:
