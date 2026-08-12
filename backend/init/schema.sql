@@ -15,6 +15,7 @@
 CREATE DATABASE IF NOT EXISTS energia_inteligente;
 USE energia_inteligente;
 DROP TABLE IF EXISTS registro_consumo;
+-- Creando nueva DB
 CREATE TABLE registro_consumo (
     id INT AUTO_INCREMENT PRIMARY KEY,
     fecha_registro DATE NOT NULL,
@@ -30,4 +31,22 @@ CREATE TABLE registro_consumo (
     consumo_kwh DECIMAL(8, 2) NOT NULL,
     categoria ENUM('Eficiente', 'Moderado', 'Ineficiente') NOT NULL,
     costo_estimado DECIMAL(12, 2)
+);
+-- Habilitar la importación local
+SET GLOBAL local_infile = 1;
+-- Importar los 10,000 registros omitiendo la primera fila de encabezados
+LOAD DATA LOCAL INFILE '/docker-entrypoint-initdb.d/datos.csv' INTO TABLE registro_consumo FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' LINES TERMINATED BY '\n' IGNORE 1 LINES (
+    fecha_registro,
+    pais,
+    localidad,
+    temperatura_ambiente,
+    tipo_inmueble,
+    numero_habitantes,
+    cantidad_equipos,
+    frecuencia_uso,
+    horas_alto_consumo,
+    uso_horario_pico,
+    consumo_kwh,
+    categoria,
+    costo_estimado
 );
