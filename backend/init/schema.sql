@@ -35,7 +35,7 @@ CREATE TABLE registro_consumo (
 -- Habilitar la importación local
 SET GLOBAL local_infile = 1;
 -- Importar los 10,000 registros omitiendo la primera fila de encabezados
-LOAD DATA LOCAL INFILE '/docker-entrypoint-initdb.d/datos.csv' INTO TABLE registro_consumo FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' LINES TERMINATED BY '\n' IGNORE 1 LINES (
+LOAD DATA INFILE '/docker-entrypoint-initdb.d/datos.csv' INTO TABLE registro_consumo FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' LINES TERMINATED BY '\n' IGNORE 1 LINES (
     fecha_registro,
     pais,
     localidad,
