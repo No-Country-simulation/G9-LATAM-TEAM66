@@ -29,20 +29,20 @@ public class RegistroConsumo {
     @Column(name = "fecha_registro", nullable = false)
     private LocalDate fechaRegistro;
 
-    @Column(name = "pais", nullable = false)
+    @Column(name = "pais", length = 25)
     private String pais;
 
-    @Column(name = "localidad", nullable = false)
+    @Column(name = "localidad", length = 30)
     private String localidad;
 
-    @Column(name = "temperatura_ambiente", nullable = false)
-    private BigDecimal temperaturaAmbiente;
+    @Column(name = "temperatura_ambiente")
+    private Integer temperaturaAmbiente;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo_inmueble", nullable = false)
     private TipoInmueble tipoInmueble;
 
-    @Column(name = "numero_habitantes", nullable = false)
+    @Column(name = "numero_habitantes")
     private Integer numeroHabitantes;
 
     @Column(name = "cantidad_equipos", nullable = false)
@@ -65,6 +65,6 @@ public class RegistroConsumo {
     @Column(name = "categoria", nullable = false)
     private CategoriaEnergetica categoria;
 
-    @Column(name = "costo_estimado", nullable = false, precision = 10, scale = 2)
+    @Column(name = "costo_estimado", precision = 12, scale = 2)
     private BigDecimal costoEstimado;
 }
