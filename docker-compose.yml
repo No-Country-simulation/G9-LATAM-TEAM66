@@ -5,6 +5,7 @@ services:
     image: mysql:8.4
     container_name: mysql_energia_db
     restart: always
+    command: --local-infile=1
     environment:
       MYSQL_DATABASE: energia_inteligente
       MYSQL_ROOT_PASSWORD: root
@@ -12,8 +13,7 @@ services:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./backend/init/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
-      - ./backend/init/datos.csv:/docker-entrypoint-initdb.d/datos.csv:ro
+      - ./backend/init:/docker-entrypoint-initdb.d:ro
 
   # API Backend en Spring Boot (Java 25)
   backend:
