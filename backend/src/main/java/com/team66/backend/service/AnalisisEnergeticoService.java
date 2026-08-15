@@ -63,7 +63,7 @@ public class AnalisisEnergeticoService {
         entidad.setConsumoKwh(request.consumoKwh());
         entidad.setUsoHorarioPico(request.usoHorarioPico());
         entidad.setCantidadEquipos(request.cantidadEquipos());
-        entidad.setFrecuenciaUso(request.frecuenciaUso() != null ? request.frecuenciaUso() : FrecuenciaUso.Fijo);
+        entidad.setFrecuenciaUso(request.frecuenciaUso() != null ? request.frecuenciaUso() : FrecuenciaUso.Media);
         entidad.setHorasAltoConsumo(request.horasAltoConsumo());
         entidad.setCategoria(categoria);
         repository.save(entidad);
