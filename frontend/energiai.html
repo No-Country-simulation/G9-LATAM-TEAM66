@@ -2,177 +2,560 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>EnergiAI — Wireframe</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EnergiAI — Panel de consumo energético</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
+  :root {
+    --bg: #0B0F14;
+    --surface: #12181F;
+    --surface-2: #1A222B;
+    --border: #262F3A;
+    --text-primary: #EDF1F5;
+    --text-secondary: #8B96A3;
+    --text-faint: #566072;
+    --teal: #2DD8C0;
+    --teal-soft: rgba(45,216,192,0.14);
+    --amber: #F5B23C;
+    --amber-soft: rgba(245,178,60,0.14);
+    --red: #F0553B;
+    --red-soft: rgba(240,85,59,0.14);
+    --focus: #5B8CFF;
+    --radius: 14px;
+    --font-display: 'Space Grotesk', 'Segoe UI', sans-serif;
+    --font-body: 'Inter', 'Segoe UI', sans-serif;
+  }
   * { box-sizing: border-box; }
   body {
-    font-family: Arial, Helvetica, sans-serif;
-    background: #F5F5F3;
+    font-family: var(--font-body);
+    background: var(--bg);
+    background-image:
+      radial-gradient(circle at 12% 0%, rgba(45,216,192,0.06), transparent 40%),
+      radial-gradient(circle at 90% 20%, rgba(245,178,60,0.05), transparent 45%);
     margin: 0;
-    padding: 40px;
+    padding: 36px 20px 60px;
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
   }
-  .container {
-    max-width: 680px;
-    margin: 0 auto;
+  .container { max-width: 760px; margin: 0 auto; }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 4px;
   }
+  .brand svg { flex-shrink: 0; }
   h1 {
-    font-size: 20px;
+    font-family: var(--font-display);
+    font-size: 21px;
     font-weight: 600;
-    margin: 0 0 20px;
-    color: #1A1A1A;
+    margin: 0;
+    letter-spacing: 0.2px;
   }
+  .subtitle {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin: 4px 0 26px;
+    padding-left: 34px;
+  }
+
   .grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
+    grid-template-columns: 300px 1fr;
+    gap: 18px;
+    align-items: start;
   }
+  @media (max-width: 700px) {
+    .grid { grid-template-columns: 1fr; }
+  }
+
   .card {
-    background: #FFFFFF;
-    border: 1px solid #E0E0DC;
-    border-radius: 12px;
-    padding: 16px 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
   }
   .section-label {
-    font-size: 13px;
-    font-weight: 600;
-    color: #666660;
-    margin: 0 0 12px;
-  }
-  label {
+    font-family: var(--font-display);
     font-size: 12px;
-    color: #999992;
-    display: block;
-    margin-bottom: 2px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin: 0 0 14px;
   }
-  input, select {
+
+  form label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    display: block;
+    margin-bottom: 4px;
+  }
+  form input, form select {
     width: 100%;
-    height: 36px;
-    border: 1px solid #D6D6D0;
-    border-radius: 6px;
-    padding: 0 10px;
-    margin-bottom: 10px;
+    height: 38px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0 12px;
+    margin-bottom: 4px;
     font-size: 14px;
-    color: #333330;
-    background: #FAFAF8;
+    font-family: var(--font-body);
+    color: var(--text-primary);
+    background: var(--surface-2);
+  }
+  form input::placeholder { color: var(--text-faint); }
+  form select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238B96A3'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; }
+  form input:focus, form select:focus {
+    outline: none;
+    border-color: var(--focus);
+    box-shadow: 0 0 0 3px rgba(91,140,255,0.18);
+  }
+  form input.invalid, form select.invalid { border-color: var(--red); }
+  .field-error {
+    font-size: 11px;
+    color: var(--red);
+    min-height: 14px;
+    margin: 0 0 8px;
   }
   .checkbox-row {
     display: flex;
     align-items: center;
     gap: 8px;
     font-size: 13px;
-    margin-bottom: 14px;
-    color: #333330;
+    margin: 6px 0 18px;
+    color: var(--text-primary);
   }
-  .checkbox-row input { width: auto; height: auto; margin: 0; }
+  .checkbox-row input {
+    width: 16px; height: 16px; margin: 0; accent-color: var(--amber);
+  }
+
   button.primary {
     width: 100%;
-    height: 40px;
-    background: #1A1A1A;
-    color: #FFFFFF;
+    height: 42px;
+    background: linear-gradient(180deg, #F5B23C, #E39A1F);
+    color: #1A1206;
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
+    font-family: var(--font-display);
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 600;
     cursor: pointer;
+    letter-spacing: 0.02em;
+    transition: filter 0.15s ease;
   }
-  .right-col {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
+  button.primary:hover:not(:disabled) { filter: brightness(1.06); }
+  button.primary:disabled { background: var(--surface-2); color: var(--text-faint); cursor: not-allowed; }
+
+  .right-col { display: flex; flex-direction: column; gap: 16px; }
+
   .badge {
     display: inline-block;
-    background: #FCEBEB;
-    color: #791F1F;
+    font-family: var(--font-display);
     font-size: 12px;
-    font-weight: 500;
-    padding: 4px 12px;
-    border-radius: 6px;
-  }
-  .confidence {
-    font-size: 13px;
-    color: #666660;
-    margin-left: 10px;
-  }
-  .cost-value {
-    font-size: 26px;
     font-weight: 600;
-    margin: 4px 0 0;
-    color: #1A1A1A;
+    padding: 5px 12px;
+    border-radius: 999px;
+    letter-spacing: 0.03em;
   }
-  .cost-note {
-    font-size: 12px;
-    color: #999992;
-    margin: 4px 0 0;
+  .badge.Ineficiente { background: var(--red-soft); color: var(--red); }
+  .badge.Moderado    { background: var(--amber-soft); color: var(--amber); }
+  .badge.Eficiente   { background: var(--teal-soft); color: var(--teal); }
+
+  .diagnostico {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin: 12px 0 0;
+    line-height: 1.55;
   }
+
+  /* Gauge */
+  .gauge-wrap { display: flex; flex-direction: column; align-items: center; margin-top: 6px; }
+  .gauge-value {
+    font-family: var(--font-display);
+    font-size: 30px;
+    font-weight: 700;
+    margin-top: -34px;
+    color: var(--text-primary);
+  }
+  .gauge-unit { font-size: 12px; color: var(--text-faint); font-weight: 500; margin-top: -2px; }
+  .gauge-legend {
+    display: flex;
+    gap: 14px;
+    margin-top: 10px;
+    font-size: 11px;
+    color: var(--text-secondary);
+  }
+  .gauge-legend span { display: flex; align-items: center; gap: 5px; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+  .dot.teal { background: var(--teal); }
+  .dot.amber { background: var(--amber); }
+  .dot.red { background: var(--red); }
+
+  /* Cost */
+  .cost-value {
+    font-family: var(--font-display);
+    font-size: 30px;
+    font-weight: 700;
+    margin: 4px 0 0;
+    color: var(--text-primary);
+  }
+  .cost-note { font-size: 12px; color: var(--text-faint); margin: 4px 0 0; }
+
+  /* Meter bars (perfil de uso) */
+  .meter-row { margin-bottom: 16px; }
+  .meter-row:last-child { margin-bottom: 4px; }
+  .meter-top {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+  }
+  .meter-top strong { color: var(--text-primary); font-weight: 600; }
+  .meter-track {
+    height: 8px;
+    background: var(--surface-2);
+    border-radius: 999px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .meter-fill { height: 100%; border-radius: 999px; }
+  .pico-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    padding-top: 4px;
+    border-top: 1px solid var(--border);
+    margin-top: 4px;
+  }
+  .pico-pill {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 9px;
+    border-radius: 999px;
+  }
+  .pico-pill.si { background: var(--amber-soft); color: var(--amber); }
+  .pico-pill.no { background: var(--teal-soft); color: var(--teal); }
+
   ul.reco {
     margin: 0;
-    padding-left: 18px;
+    padding: 0;
+    list-style: none;
     font-size: 13px;
-    line-height: 1.7;
-    color: #333330;
+    line-height: 1.5;
+    color: var(--text-primary);
   }
+  ul.reco li {
+    display: flex;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  ul.reco li:last-child { border-bottom: none; padding-bottom: 0; }
+  ul.reco li svg { flex-shrink: 0; margin-top: 2px; }
+
+  .empty-state {
+    font-size: 13px;
+    color: var(--text-faint);
+    text-align: center;
+    padding: 34px 10px;
+  }
+
+  .error-banner {
+    background: var(--red-soft);
+    border: 1px solid rgba(240,85,59,0.35);
+    color: #FF9686;
+    font-size: 13px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    margin-bottom: 16px;
+    display: none;
+  }
+  .error-banner.show { display: block; }
 </style>
 </head>
 <body>
   <div class="container">
-    <h1>EnergiAI — pantalla principal</h1>
+    <div class="brand">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z" fill="#F5B23C"/>
+      </svg>
+      <h1>EnergiAI</h1>
+    </div>
+    <p class="subtitle">Analiza el consumo eléctrico de tu inmueble y recibe recomendaciones personalizadas.</p>
+
+    <div id="errorBanner" class="error-banner"></div>
 
     <div class="grid">
 
       <!-- Columna izquierda: formulario -->
       <div class="card">
-        <p class="section-label">1. Datos de consumo</p>
+        <p class="section-label">Datos de consumo</p>
+        <form id="formConsumo" novalidate>
 
-        <label>Consumo mensual (kWh)</label>
-        <input type="number" placeholder="420">
+          <label for="consumoKwh">Consumo mensual (kWh)</label>
+          <input type="number" id="consumoKwh" min="0.01" step="0.01" placeholder="420" required>
+          <p class="field-error" id="err-consumoKwh"></p>
 
-        <label>Tipo de inmueble</label>
-        <select>
-          <option>Casa</option>
-          <option>Departamento</option>
-          <option>Local comercial</option>
-        </select>
+          <label for="tipoInmueble">Tipo de inmueble</label>
+          <select id="tipoInmueble" required>
+            <option value="Casa">Casa</option>
+            <option value="Departamento">Departamento</option>
+            <option value="Local">Local comercial</option>
+          </select>
+          <p class="field-error" id="err-tipoInmueble"></p>
 
-        <label>Cantidad de equipos</label>
-        <input type="number" placeholder="10">
+          <label for="cantidadEquipos">Cantidad de equipos</label>
+          <input type="number" id="cantidadEquipos" min="1" step="1" placeholder="10" required>
+          <p class="field-error" id="err-cantidadEquipos"></p>
 
-        <label>Horas de alto consumo</label>
-        <input type="number" placeholder="8">
+          <label for="frecuenciaUso">Frecuencia de uso</label>
+          <select id="frecuenciaUso" required>
+            <option value="Alta">Alta</option>
+            <option value="Media">Media</option>
+            <option value="Baja">Baja</option>
+          </select>
+          <p class="field-error" id="err-frecuenciaUso"></p>
 
-        <div class="checkbox-row">
-          <input type="checkbox"> Uso en horario pico
-        </div>
+          <label for="horasAltoConsumo">Horas de alto consumo</label>
+          <input type="number" id="horasAltoConsumo" min="0" max="24" step="1" placeholder="8" required>
+          <p class="field-error" id="err-horasAltoConsumo"></p>
 
-        <button class="primary">Analizar consumo</button>
+          <div class="checkbox-row">
+            <input type="checkbox" id="usoHorarioPico"> Uso en horario pico
+          </div>
+
+          <button type="submit" class="primary" id="btnAnalizar">Analizar consumo</button>
+        </form>
       </div>
 
       <!-- Columna derecha: resultados -->
-      <div class="right-col">
-
+      <div class="right-col" id="resultados">
         <div class="card">
-          <p class="section-label">2. Resultado</p>
-          <span class="badge">Ineficiente</span>
-          <span class="confidence">81% de confianza</span>
+          <p class="section-label">Resultado</p>
+          <div class="empty-state">Completa el formulario y presiona "Analizar consumo" para ver tu diagnóstico aquí.</div>
         </div>
-
-        <div class="card">
-          <p class="section-label">3. Costo estimado</p>
-          <p class="cost-value">$315.00</p>
-          <p class="cost-note">referencia $0.75/kWh</p>
-        </div>
-
-        <div class="card">
-          <p class="section-label">4. Recomendaciones</p>
-          <ul class="reco">
-            <li>Reducir uso en horario pico</li>
-            <li>Evaluar equipos de alto consumo</li>
-            <li>Distribuir cargas a lo largo del día</li>
-          </ul>
-        </div>
-
       </div>
     </div>
   </div>
+
+  <script>
+    const API_URL = 'http://localhost:8080/analisis-energetico';
+
+    const form = document.getElementById('formConsumo');
+    const btn = document.getElementById('btnAnalizar');
+    const resultados = document.getElementById('resultados');
+    const errorBanner = document.getElementById('errorBanner');
+
+    const CATEGORIA_LABEL = { Ineficiente: 'Ineficiente', Moderado: 'Moderado', Eficiente: 'Eficiente' };
+    const CATEGORIA_COLOR = { Ineficiente: '#F0553B', Moderado: '#F5B23C', Eficiente: '#2DD8C0' };
+    const CHECK_ICON = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M20 6 9 17l-5-5" stroke="#2DD8C0" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+    // ---------- Gauge (medidor tipo velocímetro) ----------
+    // Zonas fijas según la lógica del backend: Eficiente <=250, Moderado <=400, Ineficiente >400
+    const GAUGE_MAX = 700; // techo visual; valores mayores se recortan en el dibujo pero el número real siempre se muestra
+    const ZONE_1 = 250, ZONE_2 = 400;
+
+    function polarToCartesian(cx, cy, r, angleDeg) {
+      const rad = (angleDeg * Math.PI) / 180;
+      return { x: cx + r * Math.cos(rad), y: cy - r * Math.sin(rad) };
+    }
+    // angle: 180deg = valor 0 (izquierda), 0deg = valor max (derecha)
+    function valueToAngle(v, max) { return 180 - (Math.min(Math.max(v, 0), max) / max) * 180; }
+
+    function describeArc(cx, cy, r, angleStart, angleEnd) {
+      const start = polarToCartesian(cx, cy, r, angleStart);
+      const end = polarToCartesian(cx, cy, r, angleEnd);
+      const largeArc = Math.abs(angleStart - angleEnd) > 180 ? 1 : 0;
+      // sweep=1: con nuestra convención de ángulo (y = cy - r·sin), el trazo de angleStart a angleEnd
+      // (que decrece) corresponde a la dirección "positiva" de SVG, es decir, sentido horario en pantalla.
+      return `M ${start.x} ${start.y} A ${r} ${r} 0 ${largeArc} 1 ${end.x} ${end.y}`;
+    }
+
+    function buildGauge(consumoKwh, categoria) {
+      const cx = 140, cy = 118, r = 108, strokeW = 16;
+      const a0 = valueToAngle(0, GAUGE_MAX);
+      const a1 = valueToAngle(ZONE_1, GAUGE_MAX);
+      const a2 = valueToAngle(ZONE_2, GAUGE_MAX);
+      const a3 = valueToAngle(GAUGE_MAX, GAUGE_MAX);
+
+      const needleAngle = valueToAngle(consumoKwh, GAUGE_MAX);
+      const needleTip = polarToCartesian(cx, cy, r - strokeW - 6, needleAngle);
+      const needleColor = CATEGORIA_COLOR[categoria] || '#EDF1F5';
+
+      return `
+        <svg width="290" height="150" viewBox="-5 0 290 150">
+          <path d="${describeArc(cx, cy, r, a0, a1)}" stroke="#2DD8C0" stroke-width="${strokeW}" fill="none" stroke-linecap="round"/>
+          <path d="${describeArc(cx, cy, r, a1, a2)}" stroke="#F5B23C" stroke-width="${strokeW}" fill="none"/>
+          <path d="${describeArc(cx, cy, r, a2, a3)}" stroke="#F0553B" stroke-width="${strokeW}" fill="none" stroke-linecap="round"/>
+          <line x1="${cx}" y1="${cy}" x2="${needleTip.x}" y2="${needleTip.y}" stroke="${needleColor}" stroke-width="3.5" stroke-linecap="round"/>
+          <circle cx="${cx}" cy="${cy}" r="6.5" fill="${needleColor}"/>
+          <text x="${polarToCartesian(cx, cy, r + 16, a0).x}" y="${polarToCartesian(cx, cy, r + 16, a0).y}" fill="#566072" font-size="10.5" font-family="Inter, sans-serif" text-anchor="middle">0</text>
+          <text x="${polarToCartesian(cx, cy, r + 16, a1).x}" y="${polarToCartesian(cx, cy, r + 16, a1).y}" fill="#566072" font-size="10.5" font-family="Inter, sans-serif" text-anchor="middle">250</text>
+          <text x="${polarToCartesian(cx, cy, r + 16, a2).x}" y="${polarToCartesian(cx, cy, r + 16, a2).y}" fill="#566072" font-size="10.5" font-family="Inter, sans-serif" text-anchor="middle">400</text>
+          <text x="${polarToCartesian(cx, cy, r + 16, a3).x}" y="${polarToCartesian(cx, cy, r + 16, a3).y}" fill="#566072" font-size="10.5" font-family="Inter, sans-serif" text-anchor="middle">700+</text>
+        </svg>`;
+    }
+
+    // ---------- Estados ----------
+    function limpiarErroresCampo() {
+      document.querySelectorAll('.field-error').forEach(el => el.textContent = '');
+      document.querySelectorAll('input, select').forEach(el => el.classList.remove('invalid'));
+    }
+    function mostrarErrorBanner(msg) { errorBanner.textContent = msg; errorBanner.classList.add('show'); }
+    function ocultarErrorBanner() { errorBanner.classList.remove('show'); errorBanner.textContent = ''; }
+
+    function mostrarEstadoCargando() {
+      resultados.innerHTML = `
+        <div class="card">
+          <p class="section-label">Resultado</p>
+          <div class="empty-state">Analizando tu consumo...</div>
+        </div>`;
+    }
+
+    function mostrarEstadoVacio(msg) {
+      resultados.innerHTML = `
+        <div class="card">
+          <p class="section-label">Resultado</p>
+          <div class="empty-state">${msg}</div>
+        </div>`;
+    }
+
+    function renderResultado(data, formValues) {
+      const categoria = data.categoria;
+      const gaugeSvg = buildGauge(Number(data.consumo_kwh), categoria);
+
+      const maxEquipos = 25;
+      const pctEquipos = Math.min(100, (formValues.cantidadEquipos / maxEquipos) * 100);
+      const pctHoras = Math.min(100, (formValues.horasAltoConsumo / 24) * 100);
+      const barColor = CATEGORIA_COLOR[categoria] || '#2DD8C0';
+
+      resultados.innerHTML = `
+        <div class="card">
+          <p class="section-label">Resultado</p>
+          <span class="badge ${categoria}">${CATEGORIA_LABEL[categoria] || categoria}</span>
+          <p class="diagnostico">${data.diagnostico}</p>
+          <div class="gauge-wrap">
+            ${gaugeSvg}
+            <div class="gauge-value">${Number(data.consumo_kwh)}</div>
+            <div class="gauge-unit">kWh / mes</div>
+            <div class="gauge-legend">
+              <span><i class="dot teal"></i>Eficiente</span>
+              <span><i class="dot amber"></i>Moderado</span>
+              <span><i class="dot red"></i>Ineficiente</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <p class="section-label">Costo estimado</p>
+          <p class="cost-value">$${Number(data.costo_estimado).toFixed(2)}</p>
+          <p class="cost-note">tarifa de referencia: $0.75 / kWh</p>
+        </div>
+
+        <div class="card">
+          <p class="section-label">Perfil de uso</p>
+          <div class="meter-row">
+            <div class="meter-top"><span>Cantidad de equipos</span><strong>${formValues.cantidadEquipos}</strong></div>
+            <div class="meter-track"><div class="meter-fill" style="width:${pctEquipos}%; background:${barColor};"></div></div>
+          </div>
+          <div class="meter-row">
+            <div class="meter-top"><span>Horas de alto consumo</span><strong>${formValues.horasAltoConsumo} h</strong></div>
+            <div class="meter-track"><div class="meter-fill" style="width:${pctHoras}%; background:${barColor};"></div></div>
+          </div>
+          <div class="pico-indicator">
+            Uso en horario pico
+            <span class="pico-pill ${formValues.usoHorarioPico ? 'si' : 'no'}">${formValues.usoHorarioPico ? 'Sí' : 'No'}</span>
+            <span style="margin-left:auto;">Frecuencia: <strong style="color:var(--text-primary)">${formValues.frecuenciaUso}</strong></span>
+          </div>
+        </div>
+
+        <div class="card">
+          <p class="section-label">Recomendaciones</p>
+          <ul class="reco">
+            ${data.recomendaciones.map(r => `<li>${CHECK_ICON}<span>${r}</span></li>`).join('')}
+          </ul>
+        </div>`;
+    }
+
+    const CAMPO_A_API = {
+      consumoKwh: 'consumoKwh', tipoInmueble: 'tipoInmueble', cantidadEquipos: 'cantidadEquipos',
+      frecuenciaUso: 'frecuenciaUso', horasAltoConsumo: 'horasAltoConsumo'
+    };
+
+    function mostrarErroresValidacion(erroresValidacion) {
+      if (!erroresValidacion) return;
+      Object.entries(erroresValidacion).forEach(([campoApi, mensaje]) => {
+        const idCampo = Object.keys(CAMPO_A_API).find(k => CAMPO_A_API[k] === campoApi);
+        if (idCampo) {
+          document.getElementById('err-' + idCampo).textContent = mensaje;
+          document.getElementById(idCampo).classList.add('invalid');
+        }
+      });
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      ocultarErrorBanner();
+      limpiarErroresCampo();
+
+      const formValues = {
+        tipoInmueble: document.getElementById('tipoInmueble').value,
+        consumoKwh: parseFloat(document.getElementById('consumoKwh').value),
+        usoHorarioPico: document.getElementById('usoHorarioPico').checked,
+        cantidadEquipos: parseInt(document.getElementById('cantidadEquipos').value, 10),
+        frecuenciaUso: document.getElementById('frecuenciaUso').value,
+        horasAltoConsumo: parseInt(document.getElementById('horasAltoConsumo').value, 10)
+      };
+
+      const payload = {
+        tipo_inmueble: formValues.tipoInmueble,
+        consumo_kwh: formValues.consumoKwh,
+        uso_horario_pico: formValues.usoHorarioPico,
+        cantidad_equipos: formValues.cantidadEquipos,
+        frecuencia_uso: formValues.frecuenciaUso,
+        horas_alto_consumo: formValues.horasAltoConsumo
+      };
+
+      btn.disabled = true;
+      btn.textContent = 'Analizando...';
+      mostrarEstadoCargando();
+
+      try {
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await response.json();
+
+        if (!response.ok) {
+          if (response.status === 400 && data.detalles) {
+            mostrarErroresValidacion(data.detalles);
+            mostrarErrorBanner(data.error || 'Revisa los campos marcados en el formulario.');
+          } else {
+            mostrarErrorBanner(data.error || data.mensaje || 'Ocurrió un error al procesar tu solicitud.');
+          }
+          mostrarEstadoVacio('No se pudo generar el análisis. Corrige los datos e intenta de nuevo.');
+          return;
+        }
+
+        renderResultado(data, formValues);
+
+      } catch (err) {
+        console.error(err);
+        mostrarErrorBanner('No se pudo conectar con el servidor. Verifica que el backend esté corriendo en localhost:8080.');
+        mostrarEstadoVacio('No se pudo conectar con el servidor.');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Analizar consumo';
+      }
+    });
+  </script>
 </body>
 </html>
