@@ -5,7 +5,7 @@ import com.team66.backend.dto.CategoriaEnergetica;
 import com.team66.backend.dto.ConsumoRequest;
 import com.team66.backend.dto.FrecuenciaUso;
 import com.team66.backend.model.RegistroConsumo;
-import com.team66.backend.repository.RegistroConsumoReposotory;
+import com.team66.backend.repository.RegistroConsumoRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -21,9 +21,9 @@ import java.util.List;
 public class AnalisisEnergeticoService {
 
     public static final BigDecimal TARIFA_REFERENCIA = new BigDecimal("0.75");
-    private final RegistroConsumoReposotory repository;
+    private final RegistroConsumoRepository repository;
 
-    public AnalisisEnergeticoService(RegistroConsumoReposotory repository) {
+    public AnalisisEnergeticoService(RegistroConsumoRepository repository) {
         this.repository = repository;
     }
 
