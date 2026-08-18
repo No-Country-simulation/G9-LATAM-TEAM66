@@ -1,4 +1,3 @@
-version: '3.8'
 
 services:
   # Base de Datos MySQL 8.4 LTS
@@ -6,14 +5,21 @@ services:
     image: mysql:8.4
     container_name: mysql_energia_db
     restart: always
+    command: --local-infile=1
     environment:
       MYSQL_DATABASE: energia_inteligente
       MYSQL_ROOT_PASSWORD: root
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./backend/init/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+      - ./backend/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
 
   # API Backend en Spring Boot (Java 25)
   backend:
@@ -21,6 +27,7 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     container_name: api_backend_energia
+    restart: on-failure
     ports:
       - "8080:8080"
     environment:
@@ -28,7 +35,8 @@ services:
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=root
     depends_on:
-      - database
+      database:
+        condition: service_healthy
 
 volumes:
   mysql_data:
