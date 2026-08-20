@@ -70,10 +70,11 @@ public class AnalisisEnergeticoService {
 
         // Retornar DTO de respuesta
         return new AnalisisResponse(
-                categoria,
-                probabilidad,
-                recomendaciones,
-                costoEstimado);
+                entidad.getId(),
+                entidad.getCategoria(),
+                entidad.getConsumoKwh(),
+                costoEstimado,
+                recomendaciones);
     }
 
 }
