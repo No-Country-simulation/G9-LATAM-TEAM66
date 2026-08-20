@@ -5,7 +5,7 @@ import com.team66.backend.dto.CategoriaEnergetica;
 import com.team66.backend.dto.ConsumoRequest;
 import com.team66.backend.dto.FrecuenciaUso;
 import com.team66.backend.model.RegistroConsumo;
-import com.team66.backend.repository.RegistroConsumoReposotory;
+import com.team66.backend.repository.RegistroConsumoRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -21,8 +21,9 @@ import java.util.List;
 public class AnalisisEnergeticoService {
 
     public static final BigDecimal TARIFA_REFERENCIA = new BigDecimal("0.75");
-    private final RegistroConsumoReposotory repository;
-    public AnalisisEnergeticoService(RegistroConsumoReposotory repository) {
+    private final RegistroConsumoRepository repository;
+
+    public AnalisisEnergeticoService(RegistroConsumoRepository repository) {
         this.repository = repository;
     }
 
@@ -39,18 +40,18 @@ public class AnalisisEnergeticoService {
         List<String> recomendaciones = new ArrayList<>();
 
         if (request.consumoKwh().compareTo(new BigDecimal("400")) > 0 || request.horasAltoConsumo() > 8) {
-            categoria = CategoriaEnergetica.INEFICIENTE;
+            categoria = CategoriaEnergetica.Ineficiente;
             probabilidad = 0.81;
             recomendaciones.add("Reducir el uso de equipos durante los horarios pico");
             recomendaciones.add("Evaluar equipos antiguos con alto consumo energetico");
             recomendaciones.add("Distribuir las actividades de mayor consumo a lo largo del dia");
         } else if (request.consumoKwh().compareTo(new BigDecimal("250")) > 0) {
-            categoria = CategoriaEnergetica.MODERADO;
+            categoria = CategoriaEnergetica.Moderado;
             probabilidad = 0.75;
             recomendaciones.add("Desconectar aparatos en modo de espera (consumo vampiro)");
             recomendaciones.add("Optimizar las horas de uso de iluminacion y electrodomesticos");
         } else {
-            categoria = CategoriaEnergetica.EFICIENTE;
+            categoria = CategoriaEnergetica.Eficiente;
             probabilidad = 0.90;
             recomendaciones.add("Mantener los habitos actuales de consumo consciente");
         }
@@ -62,18 +63,18 @@ public class AnalisisEnergeticoService {
         entidad.setConsumoKwh(request.consumoKwh());
         entidad.setUsoHorarioPico(request.usoHorarioPico());
         entidad.setCantidadEquipos(request.cantidadEquipos());
-        entidad.setFrecuenciaUso(request.frecuenciaUso() != null ? request.frecuenciaUso() : FrecuenciaUso.FIJO);
+        entidad.setFrecuenciaUso(request.frecuenciaUso() != null ? request.frecuenciaUso() : FrecuenciaUso.Media);
         entidad.setHorasAltoConsumo(request.horasAltoConsumo());
         entidad.setCategoria(categoria);
         repository.save(entidad);
 
         // Retornar DTO de respuesta
         return new AnalisisResponse(
-                categoria,
-                probabilidad,
-                recomendaciones,
-                costoEstimado
-        );
+                entidad.getId(),
+                entidad.getCategoria(),
+                entidad.getConsumoKwh(),
+                costoEstimado,
+                recomendaciones);
     }
 
 }

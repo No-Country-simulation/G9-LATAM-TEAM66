@@ -9,7 +9,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import jakarta.persistence.Entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -30,15 +29,21 @@ public class RegistroConsumo {
     @Column(name = "fecha_registro", nullable = false)
     private LocalDate fechaRegistro;
 
+    @Column(name = "pais", length = 25)
+    private String pais;
+
+    @Column(name = "localidad", length = 30)
+    private String localidad;
+
+    @Column(name = "temperatura_ambiente")
+    private Integer temperaturaAmbiente;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo_inmueble", nullable = false)
     private TipoInmueble tipoInmueble;
 
-    @Column(name = "consumo_kwh", nullable = false, precision = 8, scale = 2)
-    private BigDecimal consumoKwh;
-
-    @Column(name = "uso_horario_pico", nullable = false)
-    private Boolean usoHorarioPico;
+    @Column(name = "numero_habitantes")
+    private Integer numeroHabitantes;
 
     @Column(name = "cantidad_equipos", nullable = false)
     private Integer cantidadEquipos;
@@ -50,7 +55,16 @@ public class RegistroConsumo {
     @Column(name = "horas_alto_consumo", nullable = false)
     private Integer horasAltoConsumo;
 
+    @Column(name = "uso_horario_pico", nullable = false)
+    private Boolean usoHorarioPico;
+
+    @Column(name = "consumo_kwh", nullable = false, precision = 8, scale = 2)
+    private BigDecimal consumoKwh;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "categoria", nullable = false)
     private CategoriaEnergetica categoria;
+
+    @Column(name = "costo_estimado", precision = 12, scale = 2)
+    private BigDecimal costoEstimado;
 }
