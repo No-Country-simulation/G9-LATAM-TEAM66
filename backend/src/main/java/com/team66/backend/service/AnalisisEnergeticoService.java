@@ -66,6 +66,7 @@ public class AnalisisEnergeticoService {
         entidad.setFrecuenciaUso(request.frecuenciaUso() != null ? request.frecuenciaUso() : FrecuenciaUso.Media);
         entidad.setHorasAltoConsumo(request.horasAltoConsumo());
         entidad.setCategoria(categoria);
+        entidad.setCostoEstimado(costoEstimado);
         repository.save(entidad);
 
         // Retornar DTO de respuesta
