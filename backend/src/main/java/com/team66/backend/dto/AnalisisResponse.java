@@ -7,23 +7,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public record AnalisisResponse(
 
-        @JsonProperty("id_registro")
-        Long idRegistro,
+                @JsonProperty("id_registro") Long idRegistro,
 
-        @JsonProperty("categoria")
-        CategoriaEnergetica categoria,
+                @JsonProperty("categoria") CategoriaEnergetica categoria,
 
-        @JsonProperty("consumo_kwh")
-        BigDecimal consumoKwh,
+                @JsonProperty("consumo_kwh") BigDecimal consumoKwh,
 
-        @JsonProperty("costo_estimado")
-        BigDecimal costoEstimado,
+                @JsonProperty("costo_estimado") BigDecimal costoEstimado,
 
-        @JsonProperty("diagnostico")
-        String diagnostico,
-
-        @JsonProperty("recomendaciones")
-        List<String> recomendaciones
+                @JsonProperty("recomendaciones") List<String> recomendaciones
 
 ) {
 }
