@@ -1,81 +1,101 @@
 package com.team66.backend.service;
 
+import com.team66.backend.client.MlServiceClient;
 import com.team66.backend.dto.AnalisisResponse;
-import com.team66.backend.dto.CategoriaEnergetica;
 import com.team66.backend.dto.ConsumoRequest;
 import com.team66.backend.dto.FrecuenciaUso;
+import com.team66.backend.dto.MlPrediccionRequest;
+import com.team66.backend.dto.MlPrediccionResponse;
 import com.team66.backend.model.RegistroConsumo;
 import com.team66.backend.repository.RegistroConsumoRepository;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
- * Me falta documentar. Héctor.
+ * Analiza el consumo energetico delegando la clasificacion al modelo
+ * Random Forest expuesto por el microservicio ml-service, y persiste el
+ * registro resultante.
  */
 @Service
 public class AnalisisEnergeticoService {
 
-    public static final BigDecimal TARIFA_REFERENCIA = new BigDecimal("0.75");
     private final RegistroConsumoRepository repository;
+    private final MlServiceClient mlServiceClient;
 
-    public AnalisisEnergeticoService(RegistroConsumoRepository repository) {
+    public AnalisisEnergeticoService(RegistroConsumoRepository repository,
+                                     MlServiceClient mlServiceClient) {
         this.repository = repository;
+        this.mlServiceClient = mlServiceClient;
     }
 
     public AnalisisResponse analizarConsumo(ConsumoRequest request) {
-        // Estimación $0.75 por kWh
-        BigDecimal costoEstimado = request.consumoKwh()
-                .multiply(TARIFA_REFERENCIA)
-                .setScale(2, RoundingMode.HALF_UP);
+        FrecuenciaUso frecuenciaUso = request.frecuenciaUso() != null
+                ? request.frecuenciaUso()
+                : FrecuenciaUso.Media;
 
-        // Clasificación preliminar por reglas simples
-        // Actualizar con Data Science
-        CategoriaEnergetica categoria;
-        double probabilidad;
-        List<String> recomendaciones = new ArrayList<>();
+        MlPrediccionResponse prediccion = mlServiceClient.predecir(new MlPrediccionRequest(
+                request.pais(),
+                request.localidad(),
+                request.tipoInmueble().name(),
+                request.numeroHabitantes(),
+                request.cantidadEquipos(),
+                frecuenciaUso.name(),
+                request.horasAltoConsumo(),
+                request.usoHorarioPico(),
+                request.temperaturaAmbiente(),
+                request.consumoKwh()
+        ));
 
-        if (request.consumoKwh().compareTo(new BigDecimal("400")) > 0 || request.horasAltoConsumo() > 8) {
-            categoria = CategoriaEnergetica.Ineficiente;
-            probabilidad = 0.81;
-            recomendaciones.add("Reducir el uso de equipos durante los horarios pico");
-            recomendaciones.add("Evaluar equipos antiguos con alto consumo energetico");
-            recomendaciones.add("Distribuir las actividades de mayor consumo a lo largo del dia");
-        } else if (request.consumoKwh().compareTo(new BigDecimal("250")) > 0) {
-            categoria = CategoriaEnergetica.Moderado;
-            probabilidad = 0.75;
-            recomendaciones.add("Desconectar aparatos en modo de espera (consumo vampiro)");
-            recomendaciones.add("Optimizar las horas de uso de iluminacion y electrodomesticos");
-        } else {
-            categoria = CategoriaEnergetica.Eficiente;
-            probabilidad = 0.90;
-            recomendaciones.add("Mantener los habitos actuales de consumo consciente");
-        }
+        MlPrediccionResponse.EstimacionFinanciera finanzas = prediccion.estimacionFinanciera();
 
         // Persistir en la base de datos
         RegistroConsumo entidad = new RegistroConsumo();
         entidad.setFechaRegistro(LocalDate.now());
+        entidad.setPais(request.pais());
+        entidad.setLocalidad(request.localidad());
+        entidad.setTemperaturaAmbiente(request.temperaturaAmbiente().setScale(0, RoundingMode.HALF_UP).intValue());
         entidad.setTipoInmueble(request.tipoInmueble());
+        entidad.setNumeroHabitantes(request.numeroHabitantes());
         entidad.setConsumoKwh(request.consumoKwh());
         entidad.setUsoHorarioPico(request.usoHorarioPico());
         entidad.setCantidadEquipos(request.cantidadEquipos());
-        entidad.setFrecuenciaUso(request.frecuenciaUso() != null ? request.frecuenciaUso() : FrecuenciaUso.Media);
+        entidad.setFrecuenciaUso(frecuenciaUso);
         entidad.setHorasAltoConsumo(request.horasAltoConsumo());
-        entidad.setCategoria(categoria);
-        entidad.setCostoEstimado(costoEstimado);
-        repository.save(entidad);
+        entidad.setCategoria(prediccion.categoria());
+        entidad.setCostoEstimado(finanzas.costoActualMensual());
+        RegistroConsumo guardado = repository.save(entidad);
+
+        MlPrediccionResponse.Comparacion comp = prediccion.comparacion();
+        AnalisisResponse.Comparacion comparacion = comp == null ? null
+                : new AnalisisResponse.Comparacion(
+                        comp.consumoPorHabitante(),
+                        comp.promedioTipoCategoria(),
+                        comp.diferenciaPorcentual(),
+                        comp.porEncimaDelPromedio());
+
+        MlPrediccionResponse.ContextoDataset ctx = prediccion.contextoDataset();
+        AnalisisResponse.ContextoDataset contexto = ctx == null ? null
+                : new AnalisisResponse.ContextoDataset(
+                        ctx.porcentajeGeneral(),
+                        ctx.porcentajeTuTipoInmueble(),
+                        ctx.porcentajeTuPais(),
+                        ctx.porcentajeTuLocalidad(),
+                        ctx.distribucionTuTipoInmueble());
 
         // Retornar DTO de respuesta
         return new AnalisisResponse(
-                entidad.getId(),
-                entidad.getCategoria(),
-                entidad.getConsumoKwh(),
-                costoEstimado,
-                recomendaciones);
+                guardado.getId(),
+                prediccion.categoria(),
+                prediccion.probabilidad(),
+                request.consumoKwh(),
+                finanzas.costoActualMensual(),
+                finanzas.ahorroMonetarioMensual(),
+                finanzas.porcentajeReduccionEstimado(),
+                comparacion,
+                contexto,
+                prediccion.recomendaciones());
     }
 
 }

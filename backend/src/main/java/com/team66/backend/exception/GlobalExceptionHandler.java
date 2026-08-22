@@ -6,6 +6,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.RestClientException;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -39,4 +40,15 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(respuesta);
     }
+
+    @ExceptionHandler(RestClientException.class)
+    public ResponseEntity<Map<String, Object>> handleMlServiceError(RestClientException ex) {
+        Map<String, Object> respuesta = new HashMap<>();
+        respuesta.put("timestamp", LocalDateTime.now());
+        respuesta.put("status", HttpStatus.SERVICE_UNAVAILABLE.value());
+        respuesta.put("error", "No se pudo contactar el servicio de prediccion (ml-service)");
+
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(respuesta);
+    }
+
 }
