@@ -37,38 +37,45 @@ class AnalisisEnergeticoControllerTest {
 
     private ConsumoRequest requestValido() {
         return new ConsumoRequest(
+                "Colombia",
+                "Bogotá",
+                new BigDecimal("18.5"),
                 TipoInmueble.Casa,
+                4,
                 new BigDecimal("320.50"),
                 true,
                 8,
                 FrecuenciaUso.Alta,
-                6
-        );
+                6);
+    }
+
+    private AnalisisResponse respuestaSimulada() {
+        return new AnalisisResponse(
+                1L,
+                CategoriaEnergetica.Moderado,
+                0.87,
+                new BigDecimal("320.50"),
+                new BigDecimal("240.38"),
+                new BigDecimal("50.00"),
+                new BigDecimal("20.5"),
+                List.of("Desconectar aparatos en modo de espera (consumo vampiro)"));
     }
 
     @Test
     void analizar_devuelveOkConLaRespuestaDelService() {
-        AnalisisResponse respuestaSimulada = new AnalisisResponse(
-                1L,
-                CategoriaEnergetica.Moderado,
-                new BigDecimal("320.50"),
-                new BigDecimal("240.38"),
-                List.of("Desconectar aparatos en modo de espera (consumo vampiro)")
-        );
-        when(service.analizarConsumo(any(ConsumoRequest.class))).thenReturn(respuestaSimulada);
+        AnalisisResponse esperada = respuestaSimulada();
+        when(service.analizarConsumo(any(ConsumoRequest.class))).thenReturn(esperada);
 
         ResponseEntity<AnalisisResponse> response = controller.analizar(requestValido());
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo(respuestaSimulada);
+        assertThat(response.getBody()).isEqualTo(esperada);
     }
 
     @Test
     void analizar_delegaElRequestTalCualAlService() {
         ConsumoRequest request = requestValido();
-        when(service.analizarConsumo(any(ConsumoRequest.class))).thenReturn(
-                new AnalisisResponse(1L, CategoriaEnergetica.Eficiente, request.consumoKwh(),
-                        BigDecimal.ONE, List.of()));
+        when(service.analizarConsumo(any(ConsumoRequest.class))).thenReturn(respuestaSimulada());
 
         controller.analizar(request);
 
