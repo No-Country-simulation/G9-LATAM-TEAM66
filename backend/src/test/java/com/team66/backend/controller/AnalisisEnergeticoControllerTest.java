@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -58,6 +59,17 @@ class AnalisisEnergeticoControllerTest {
                 new BigDecimal("240.38"),
                 new BigDecimal("50.00"),
                 new BigDecimal("20.5"),
+                new AnalisisResponse.Comparacion(
+                        new BigDecimal("80.13"),
+                        new BigDecimal("76.82"),
+                        new BigDecimal("4.3"),
+                        true),
+                new AnalisisResponse.ContextoDataset(
+                        new BigDecimal("33.0"),
+                        new BigDecimal("34.18"),
+                        new BigDecimal("33.5"),
+                        new BigDecimal("32.0"),
+                        Map.of("Moderado", new BigDecimal("34.18"))),
                 List.of("Desconectar aparatos en modo de espera (consumo vampiro)"));
     }
 

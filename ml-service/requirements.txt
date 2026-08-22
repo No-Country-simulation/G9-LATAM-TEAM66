@@ -1,0 +1,8 @@
+# Las versiones deben coincidir con las usadas para entrenar el modelo
+# (modelo_energia.joblib fue serializado con scikit-learn 1.6.1).
+fastapi==0.121.2
+uvicorn[standard]==0.40.0
+scikit-learn==1.6.1
+pandas==2.2.3
+numpy==2.2.6
+joblib==1.4.2

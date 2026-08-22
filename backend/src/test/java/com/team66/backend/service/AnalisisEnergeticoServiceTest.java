@@ -18,7 +18,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
+import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -59,6 +60,19 @@ class AnalisisEnergeticoServiceTest {
                         new BigDecimal("240.38"),
                         new BigDecimal("50.00"),
                         new BigDecimal("20.5")),
+                new MlPrediccionResponse.Comparacion(
+                        new BigDecimal("80.13"),
+                        new BigDecimal("76.82"),
+                        new BigDecimal("4.3"),
+                        true),
+                new MlPrediccionResponse.ContextoDataset(
+                        new BigDecimal("33.0"),
+                        new BigDecimal("34.18"),
+                        new BigDecimal("33.5"),
+                        new BigDecimal("32.0"),
+                        Map.of("Eficiente", new BigDecimal("31.87"),
+                               "Moderado", new BigDecimal("34.18"),
+                               "Ineficiente", new BigDecimal("33.96"))),
                 List.of("Recomendacion de prueba"));
     }
 
@@ -83,6 +97,17 @@ class AnalisisEnergeticoServiceTest {
         assertThat(response.categoria()).isEqualTo(CategoriaEnergetica.Moderado);
         assertThat(response.probabilidad()).isEqualTo(0.87);
         assertThat(response.recomendaciones()).containsExactly("Recomendacion de prueba");
+    }
+
+    @Test
+    void analizarConsumo_incluyeLaComparacionContraElPromedioDeSuCategoria() {
+        AnalisisResponse response = service.analizarConsumo(requestValido());
+
+        assertThat(response.comparacion()).isNotNull();
+        assertThat(response.comparacion().consumoPorHabitante()).isEqualByComparingTo("80.13");
+        assertThat(response.comparacion().promedioTipoCategoria()).isEqualByComparingTo("76.82");
+        assertThat(response.comparacion().diferenciaPorcentual()).isEqualByComparingTo("4.3");
+        assertThat(response.comparacion().porEncimaDelPromedio()).isTrue();
     }
 
     @Test
