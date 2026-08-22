@@ -204,6 +204,29 @@
   }
   .cost-note { font-size: 12px; color: var(--text-faint); margin: 4px 0 0; }
 
+  /* Comparacion con la categoria */
+  .comp-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .comp-row strong {
+    color: var(--text-primary);
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 13.5px;
+  }
+  .comp-verdict {
+    font-size: 12.5px;
+    line-height: 1.5;
+    margin: 12px 0 0;
+    font-weight: 500;
+  }
+
   /* Meter bars (perfil de uso) */
   .meter-row { margin-bottom: 16px; }
   .meter-row:last-child { margin-bottom: 4px; }
@@ -302,6 +325,22 @@
           <input type="number" id="consumoKwh" min="0.01" step="0.01" placeholder="420" required>
           <p class="field-error" id="err-consumoKwh"></p>
 
+          <label for="pais">País</label>
+          <select id="pais" required>
+            <option value="Colombia">Colombia</option>
+            <option value="México">México</option>
+            <option value="Perú">Perú</option>
+          </select>
+          <p class="field-error" id="err-pais"></p>
+
+          <label for="localidad">Localidad</label>
+          <select id="localidad" required></select>
+          <p class="field-error" id="err-localidad"></p>
+
+          <label for="temperaturaAmbiente">Temperatura ambiente (°C)</label>
+          <input type="number" id="temperaturaAmbiente" min="-10" max="50" step="0.1" placeholder="22.5" required>
+          <p class="field-error" id="err-temperaturaAmbiente"></p>
+
           <label for="tipoInmueble">Tipo de inmueble</label>
           <select id="tipoInmueble" required>
             <option value="Casa">Casa</option>
@@ -309,6 +348,10 @@
             <option value="Local">Local comercial</option>
           </select>
           <p class="field-error" id="err-tipoInmueble"></p>
+
+          <label for="numeroHabitantes">Número de habitantes</label>
+          <input type="number" id="numeroHabitantes" min="1" step="1" placeholder="4" required>
+          <p class="field-error" id="err-numeroHabitantes"></p>
 
           <label for="cantidadEquipos">Cantidad de equipos</label>
           <input type="number" id="cantidadEquipos" min="1" step="1" placeholder="10" required>
@@ -345,12 +388,35 @@
   </div>
 
   <script>
-    const API_URL = 'http://localhost:8080/analisis-energetico';
+    // Servida por nginx (Docker): ruta relativa, mismo origen -> no hay CORS ni IP fija.
+    // Abierta como archivo suelto (file://): apunta al backend local.
+    const API_URL = window.location.protocol === 'file:'
+      ? 'http://localhost:8080/analisis-energetico'
+      : '/analisis-energetico';
 
     const form = document.getElementById('formConsumo');
     const btn = document.getElementById('btnAnalizar');
     const resultados = document.getElementById('resultados');
     const errorBanner = document.getElementById('errorBanner');
+
+    // Localidades reconocidas por el modelo entrenado (Data Science)
+    const LOCALIDADES_POR_PAIS = {
+      'Colombia': ['Barranquilla', 'Bogotá', 'Bucaramanga', 'Cali', 'Medellín'],
+      'México': ['Ciudad de México', 'Guadalajara', 'Monterrey', 'Mérida', 'Tijuana'],
+      'Perú': ['Arequipa', 'Cusco', 'Lima', 'Piura', 'Puno']
+    };
+
+    const selectPais = document.getElementById('pais');
+    const selectLocalidad = document.getElementById('localidad');
+
+    function cargarLocalidades() {
+      const localidades = LOCALIDADES_POR_PAIS[selectPais.value] || [];
+      selectLocalidad.innerHTML = localidades
+        .map(l => `<option value="${l}">${l}</option>`)
+        .join('');
+    }
+    selectPais.addEventListener('change', cargarLocalidades);
+    cargarLocalidades();
 
     const CATEGORIA_LABEL = { Ineficiente: 'Ineficiente', Moderado: 'Moderado', Eficiente: 'Eficiente' };
     const CATEGORIA_COLOR = { Ineficiente: '#F0553B', Moderado: '#F5B23C', Eficiente: '#2DD8C0' };
@@ -439,7 +505,7 @@
         <div class="card">
           <p class="section-label">Resultado</p>
           <span class="badge ${categoria}">${CATEGORIA_LABEL[categoria] || categoria}</span>
-          
+          <p class="diagnostico">Clasificado por el modelo con ${(Number(data.probabilidad) * 100).toFixed(1)}% de confianza.</p>
           <div class="gauge-wrap">
             ${gaugeSvg}
             <div class="gauge-value">${Number(data.consumo_kwh)}</div>
@@ -456,7 +522,38 @@
           <p class="section-label">Costo estimado</p>
           <p class="cost-value">$${Number(data.costo_estimado).toFixed(2)}</p>
           <p class="cost-note">tarifa de referencia: $0.75 / kWh</p>
+          ${Number(data.ahorro_estimado_mensual) > 0 ? `
+            <p class="cost-note" style="margin-top:10px;color:var(--teal)">
+              Ahorro potencial: $${Number(data.ahorro_estimado_mensual).toFixed(2)} / mes
+              (${Number(data.porcentaje_reduccion_estimado).toFixed(1)}% menos)
+            </p>` : ''}
         </div>
+
+        ${data.comparacion ? `
+        <div class="card">
+          <p class="section-label">Comparación con tu categoría</p>
+          <div class="comp-row">
+            <span>Tu consumo por habitante</span>
+            <strong>${Number(data.comparacion.consumo_por_habitante).toFixed(1)} kWh</strong>
+          </div>
+          <div class="comp-row">
+            <span>Promedio · ${formValues.tipoInmueble} "${categoria}"</span>
+            <strong>${Number(data.comparacion.promedio_tipo_categoria).toFixed(1)} kWh</strong>
+          </div>
+          <p class="comp-verdict" style="color:${data.comparacion.por_encima_del_promedio ? 'var(--red)' : 'var(--teal)'}">
+            ${data.comparacion.por_encima_del_promedio
+              ? `Consumes ${Math.abs(Number(data.comparacion.diferencia_porcentual)).toFixed(1)}% más que el promedio de tu categoría`
+              : `Consumes ${Math.abs(Number(data.comparacion.diferencia_porcentual)).toFixed(1)}% menos que el promedio de tu categoría`}
+          </p>
+          ${data.contexto_dataset && data.contexto_dataset.porcentaje_tu_tipo_inmueble != null ? `
+            <p class="cost-note" style="margin-top:12px">
+              ${Number(data.contexto_dataset.porcentaje_tu_tipo_inmueble).toFixed(1)}% de los inmuebles tipo
+              ${formValues.tipoInmueble} están en esta categoría${
+                data.contexto_dataset.porcentaje_tu_localidad != null
+                  ? ` · ${Number(data.contexto_dataset.porcentaje_tu_localidad).toFixed(1)}% en ${formValues.localidad}`
+                  : ''}
+            </p>` : ''}
+        </div>` : ''}
 
         <div class="card">
           <p class="section-label">Perfil de uso</p>
@@ -505,7 +602,11 @@
       limpiarErroresCampo();
 
       const formValues = {
+        pais: document.getElementById('pais').value,
+        localidad: document.getElementById('localidad').value,
+        temperaturaAmbiente: parseFloat(document.getElementById('temperaturaAmbiente').value),
         tipoInmueble: document.getElementById('tipoInmueble').value,
+        numeroHabitantes: parseInt(document.getElementById('numeroHabitantes').value, 10),
         consumoKwh: parseFloat(document.getElementById('consumoKwh').value),
         usoHorarioPico: document.getElementById('usoHorarioPico').checked,
         cantidadEquipos: parseInt(document.getElementById('cantidadEquipos').value, 10),
@@ -514,7 +615,11 @@
       };
 
       const payload = {
+        pais: formValues.pais,
+        localidad: formValues.localidad,
+        temperatura_ambiente: formValues.temperaturaAmbiente,
         tipo_inmueble: formValues.tipoInmueble,
+        numero_habitantes: formValues.numeroHabitantes,
         consumo_kwh: formValues.consumoKwh,
         uso_horario_pico: formValues.usoHorarioPico,
         cantidad_equipos: formValues.cantidadEquipos,

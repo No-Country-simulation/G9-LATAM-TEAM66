@@ -2,7 +2,6 @@ package com.team66.backend.service;
 
 import com.team66.backend.client.MlServiceClient;
 import com.team66.backend.dto.AnalisisResponse;
-import com.team66.backend.dto.CategoriaEnergetica;
 import com.team66.backend.dto.ConsumoRequest;
 import com.team66.backend.dto.FrecuenciaUso;
 import com.team66.backend.dto.MlPrediccionRequest;
@@ -11,14 +10,13 @@ import com.team66.backend.model.RegistroConsumo;
 import com.team66.backend.repository.RegistroConsumoRepository;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
- * Me falta documentar. Héctor.
+ * Analiza el consumo energetico delegando la clasificacion al modelo
+ * Random Forest expuesto por el microservicio ml-service, y persiste el
+ * registro resultante.
  */
 @Service
 public class AnalisisEnergeticoService {
@@ -26,13 +24,13 @@ public class AnalisisEnergeticoService {
     private final RegistroConsumoRepository repository;
     private final MlServiceClient mlServiceClient;
 
-    public AnalisisEnergeticoService(RegistroConsumoRepository repository, MlServiceClient mlServiceClient) {
+    public AnalisisEnergeticoService(RegistroConsumoRepository repository,
+                                     MlServiceClient mlServiceClient) {
         this.repository = repository;
         this.mlServiceClient = mlServiceClient;
     }
 
     public AnalisisResponse analizarConsumo(ConsumoRequest request) {
-
         FrecuenciaUso frecuenciaUso = request.frecuenciaUso() != null
                 ? request.frecuenciaUso()
                 : FrecuenciaUso.Media;
@@ -47,10 +45,12 @@ public class AnalisisEnergeticoService {
                 request.horasAltoConsumo(),
                 request.usoHorarioPico(),
                 request.temperaturaAmbiente(),
-                request.consumoKwh()));
+                request.consumoKwh()
+        ));
 
         MlPrediccionResponse.EstimacionFinanciera finanzas = prediccion.estimacionFinanciera();
 
+        // Persistir en la base de datos
         RegistroConsumo entidad = new RegistroConsumo();
         entidad.setFechaRegistro(LocalDate.now());
         entidad.setPais(request.pais());
@@ -67,6 +67,23 @@ public class AnalisisEnergeticoService {
         entidad.setCostoEstimado(finanzas.costoActualMensual());
         RegistroConsumo guardado = repository.save(entidad);
 
+        MlPrediccionResponse.Comparacion comp = prediccion.comparacion();
+        AnalisisResponse.Comparacion comparacion = comp == null ? null
+                : new AnalisisResponse.Comparacion(
+                        comp.consumoPorHabitante(),
+                        comp.promedioTipoCategoria(),
+                        comp.diferenciaPorcentual(),
+                        comp.porEncimaDelPromedio());
+
+        MlPrediccionResponse.ContextoDataset ctx = prediccion.contextoDataset();
+        AnalisisResponse.ContextoDataset contexto = ctx == null ? null
+                : new AnalisisResponse.ContextoDataset(
+                        ctx.porcentajeGeneral(),
+                        ctx.porcentajeTuTipoInmueble(),
+                        ctx.porcentajeTuPais(),
+                        ctx.porcentajeTuLocalidad(),
+                        ctx.distribucionTuTipoInmueble());
+
         // Retornar DTO de respuesta
         return new AnalisisResponse(
                 guardado.getId(),
@@ -76,6 +93,8 @@ public class AnalisisEnergeticoService {
                 finanzas.costoActualMensual(),
                 finanzas.ahorroMonetarioMensual(),
                 finanzas.porcentajeReduccionEstimado(),
+                comparacion,
+                contexto,
                 prediccion.recomendaciones());
     }
 
